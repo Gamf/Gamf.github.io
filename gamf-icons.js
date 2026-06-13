@@ -24,6 +24,7 @@
   sym('i-trophy','<path d="M7 4h10v5a5 5 0 0 1-10 0z" '+L+'/><path d="M7 6H4.5v1A3 3 0 0 0 7.5 10" '+L+'/><path d="M17 6h2.5v1A3 3 0 0 1 16.5 10" '+L+'/><line x1="12" y1="14" x2="12" y2="17" '+L+'/><path d="M8.5 20h7l-.6-3h-5.8z" '+L+'/>') +
   sym('i-bolt','<polygon points="13,2 5,13 11,13 10,22 19,10 13,10" fill="currentColor"/>') +
   sym('i-stats','<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" '+L+'/>') +
+  sym('i-info','<circle cx="12" cy="12" r="9" '+L+'/><line x1="12" y1="11" x2="12" y2="16" '+L+'/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/>') +
   // in-game control icons (kept for the 20 games)
   sym('i-back','<path d="M15 5l-7 7 7 7" '+L+'/>') +
   sym('i-pause','<line x1="9" y1="5" x2="9" y2="19" '+L+'/><line x1="15" y1="5" x2="15" y2="19" '+L+'/>') +
