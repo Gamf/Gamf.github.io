@@ -1,0 +1,11 @@
+{
+  "title": "Gamf",
+  "tagline": "Open-source games for your fingers.",
+  "genres": [
+    { "slug": "puzzle",  "title": "Puzzle",  "icon": "🧩",  "color": "#6c8cff", "base": "../puzzle/" },
+    { "slug": "arcade",  "title": "Arcade",  "icon": "🕹️",  "color": "#ff7a6c", "base": "../arcade/" },
+    { "slug": "3d",      "title": "3D",      "icon": "🎲",  "color": "#5ad1a8", "base": "../3d/" },
+    { "slug": "fps",     "title": "FPS",     "icon": "🎯",  "color": "#e0556b", "base": "../fps/" },
+    { "slug": "racing",  "title": "Racing",  "icon": "🏎️",  "color": "#f2c14e", "base": "../racing/" }
+  ]
+}

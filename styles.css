@@ -1,0 +1,81 @@
+/* Hub portal styles. Touch-first: big cards, no zoom, scrollable content area. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(120% 80% at 50% -10%, #1b1f2e 0%, #0e0f13 60%);
+  color: #f2f3f5;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+.safe {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.hub-header {
+  padding: 28px 4px 8px;
+  text-align: center;
+}
+.hub-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #6c8cff, #5ad1a8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.tagline { margin: 6px 0 0; color: #9aa0ad; font-size: 0.95rem; }
+
+main { max-width: 880px; margin: 0 auto; padding: 8px 0 40px; }
+
+.genre-section { margin: 24px 0; }
+.genre-heading {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.25rem; margin: 0 0 12px; padding: 0 2px;
+}
+.genre-heading .icon { font-size: 1.5rem; }
+.genre-heading .count { margin-left: auto; color: #7d8493; font-size: 0.85rem; }
+
+/* Responsive card grid — auto-fills, big tap targets. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #181b24;
+  border: 1px solid #242838;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 44px;
+  transition: transform 0.08s ease, border-color 0.15s ease;
+}
+.card:active { transform: scale(0.97); }
+.card-thumb {
+  aspect-ratio: 16 / 10;
+  display: grid; place-items: center;
+  font-size: 2.4rem;
+  background: linear-gradient(135deg, var(--c, #2a2f42), #11131b);
+}
+.card-body { padding: 10px 12px 14px; }
+.card-title { font-weight: 600; font-size: 0.98rem; }
+.card-tags { margin-top: 4px; color: #7d8493; font-size: 0.78rem; }
+
+.empty, .error { color: #7d8493; font-size: 0.9rem; padding: 4px 2px; }
+.error { color: #ff8f80; }
+
+.hub-footer {
+  text-align: center; color: #5a6070; font-size: 0.8rem;
+  padding: 20px 0 28px;
+}
