@@ -3,23 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0e0f13">
+  <meta name="theme-color" content="#07080c">
   <title>Gamf — touch games</title>
+  <meta name="description" content="A hand-picked collection of touch-first browser games. Free, open-source, no installs.">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="gamf.css">
 </head>
-<body class="safe">
-  <header class="hub-header">
-    <h1 id="hub-title">Gamf</h1>
-    <p id="hub-tagline" class="tagline"></p>
-    <p class="header-nav"><a href="stats.html">📊 Stats</a></p>
-  </header>
+<body class="gx">
+  <script src="gamf-icons.js"></script>
+  <script src="gamf-stats.js"></script>
 
-  <main id="genres"><!-- genre sections injected by app.js --></main>
+  <nav class="gx-nav">
+    <div class="gx-nav__inner">
+      <a class="gx-logo" href="./">
+        <span class="gx-logo__mark"><svg class="gx-ico"><use href="#i-logo"/></svg></span>
+        Gamf
+      </a>
+      <span class="gx-nav__spacer"></span>
+      <div class="gx-nav__links">
+        <a class="gx-btn gx-btn--ghost gx-btn--sm" href="stats.html"><svg class="gx-ico"><use href="#i-stats"/></svg> Stats</a>
+      </div>
+    </div>
+  </nav>
 
-  <footer class="hub-footer">
-    <span>Open-source · touch-first · hosted on GitHub Pages</span>
-  </footer>
+  <div class="gx-wrap">
+    <!-- Hero (featured game, chosen at runtime) -->
+    <section class="gx-hero" id="hero" hidden>
+      <div class="gx-hero__art"></div>
+      <div class="gx-hero__glyph" id="hero-glyph">🎮</div>
+      <div class="gx-hero__body">
+        <span class="gx-hero__eyebrow"><svg class="gx-ico" style="width:1em;height:1em"><use href="#i-trophy"/></svg> Featured</span>
+        <h1 class="gx-hero__title" id="hero-title">Gamf</h1>
+        <p class="gx-hero__sub" id="hero-sub">Touch-first browser games.</p>
+        <a class="gx-btn gx-btn--primary" id="hero-play" href="#"><svg class="gx-ico"><use href="#i-play"/></svg> Play now</a>
+      </div>
+    </section>
+
+    <header style="text-align:center;margin:8px 0 4px">
+      <div class="gx-brandline">GAMF</div>
+      <p style="color:var(--gx-text-2);margin:6px 0 0" id="tagline">Open-source games, made for your fingers.</p>
+    </header>
+
+    <main id="rows">
+      <div class="gx-row">
+        <div class="gx-row__head"><span class="gx-row__title">Loading…</span></div>
+        <div class="gx-scroller">
+          <div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="gx-foot gx-wrap">Open-source · touch-first · hosted on GitHub Pages</footer>
 
   <script type="module" src="app.js"></script>
 </body>

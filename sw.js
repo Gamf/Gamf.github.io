@@ -2,12 +2,14 @@
 // Strategy: cache the app shell on install; serve cache-first, fall back to
 // network. Bump CACHE_VERSION whenever the hub files change.
 
-const CACHE_VERSION = 'gamf-hub-v1';
+const CACHE_VERSION = 'gamf-hub-v2';
 const SHELL = [
   './',
   'index.html',
   'stats.html',
-  'styles.css',
+  'gamf.css',
+  'gamf-icons.js',
+  'gamf-stats.js',
   'app.js',
   'genres.json',
   'manifest.webmanifest'
