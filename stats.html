@@ -3,61 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#07080c">
-  <title>Gamf — stats</title>
-  <meta name="description" content="Live catalog, visit and play stats for the Gamf touch-game portal.">
+  <meta name="theme-color" content="#15110e">
+  <title>Gamf Arcade — stats</title>
+  <meta name="description" content="Live catalog, visit and play stats for the Gamf Arcade touch-game portal.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="gamf.css">
 </head>
-<body class="gx" style="--gx-accent:#4ea8ff">
+<body class="gx">
   <script src="gamf-icons.js"></script>
   <script src="gamf-stats.js"></script>
+  <div class="gx-vignette" aria-hidden="true"></div>
 
   <nav class="gx-nav">
+    <div class="gx-nav__bar"></div>
     <div class="gx-nav__inner">
       <a class="gx-logo" href="./">
-        <span class="gx-logo__mark"><svg class="gx-ico"><use href="#i-logo"/></svg></span>
-        Gamf
+        <span class="gx-logo__mark">G</span>
+        <span class="gx-logo__word">GAMF</span>
       </a>
       <span class="gx-nav__spacer"></span>
-      <div class="gx-nav__links">
-        <a class="gx-btn gx-btn--ghost gx-btn--sm" href="./"><svg class="gx-ico"><use href="#i-back"/></svg> Back to Gamf</a>
-      </div>
+      <a class="gx-back" href="./"><svg class="gx-ico"><use href="#i-back"/></svg> Hub</a>
     </div>
   </nav>
 
   <div class="gx-wrap">
-    <header style="text-align:center;margin:8px 0 4px">
-      <span class="gx-hero__eyebrow"><svg class="gx-ico" style="width:1em;height:1em"><use href="#i-stats"/></svg> Live dashboard</span>
-      <h1 class="gx-brandline" style="font-size:clamp(2rem,9vw,3.4rem);margin-top:10px">STATS</h1>
-      <p style="color:var(--gx-text-2);margin:6px 0 0">Catalog, global activity, and your device.</p>
-    </header>
+    <h1 class="gx-section-title"><svg class="gx-ico"><use href="#i-stats"/></svg> Stats</h1>
 
     <main id="stats">
       <div class="gx-stats-grid" aria-hidden="true">
-        <div class="gx-skel" style="aspect-ratio:auto;height:110px"></div>
-        <div class="gx-skel" style="aspect-ratio:auto;height:110px"></div>
-        <div class="gx-skel" style="aspect-ratio:auto;height:110px"></div>
-        <div class="gx-skel" style="aspect-ratio:auto;height:110px"></div>
+        <div class="gx-skel" style="min-height:0;height:110px"></div>
+        <div class="gx-skel" style="min-height:0;height:110px"></div>
+        <div class="gx-skel" style="min-height:0;height:110px"></div>
+        <div class="gx-skel" style="min-height:0;height:110px"></div>
       </div>
-      <p class="gx-empty" id="loading">Loading stats…</p>
+      <p class="gx-empty" id="loading"><h3>LOADING STATS</h3><p>Insert coin</p></p>
     </main>
   </div>
 
-  <footer class="gx-foot gx-wrap">Open-source · touch-first · hosted on GitHub Pages</footer>
+  <footer class="gx-foot-note">Open Source · Touch First · Hosted On GitHub Pages</footer>
 
   <script type="module">
-    // stats.html — live catalog + activity dashboard for the Gamf portal.
+    // stats.html — live catalog + activity dashboard for the Gamf Arcade portal.
     // Mirrors app.js: fetch genres.json, then each genre's games.json same-origin,
     // resolving each genre base relative to this page via new URL(base, document.baseURI).
-    // Global activity comes from window.gamfStats (Abacus counters); per-device
-    // figures come from localStorage. Both degrade to '—' when offline.
+    // Cabinet rating / HI score / hot are derived EXACTLY like app.js so the numbers
+    // match the homepage. Global activity comes from window.gamfStats (Abacus
+    // counters); per-device figures come from localStorage. Both degrade to '—'.
 
-    const ICON = { puzzle: 'i-puzzle', arcade: 'i-arcade', '3d': 'i-cube', fps: 'i-target', racing: 'i-car', 'others-games': 'i-globe' };
+    const ICON = { puzzle: 'i-puzzle', arcade: 'i-arcade', '3d': 'i-cube', fps: 'i-target', racing: 'i-flag', 'others-games': 'i-coin' };
+    const fKey = (slug) => (slug === 'others-games' ? 'classics' : slug);
     const statsEl = document.getElementById('stats');
+
+    function ico(id, cls) { return `<svg class="gx-ico${cls ? ' ' + cls : ''}"><use href="#${id}"/></svg>`; }
+    // Verbatim hash from app.js — must match so ratings/scores/hot line up.
+    function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 
     // Count this page view as a site visit (global + local).
     if (window.gamfVisit) window.gamfVisit();
@@ -79,12 +81,10 @@
       // { genre, games: [], failed: true } so one bad genre doesn't break the page.
       const results = await Promise.all(genres.map(async (genre) => {
         const base = new URL(genre.base, document.baseURI);
+        const label = genre.slug === 'others-games' ? 'CLASSICS' : (genre.title || genre.slug).toUpperCase();
         try {
           const manifest = await fetchJSON(new URL('games.json', base));
-          const games = (manifest.games || []).map((g) => ({
-            ...g, _genre: genre,
-            _url: g.path ? new URL(g.path, base).href : null
-          }));
+          const games = (manifest.games || []).map((g) => decorate(g, genre, base, label));
           return { genre, games, failed: false };
         } catch (err) {
           return { genre, games: [], failed: true, error: err.message };
@@ -94,6 +94,20 @@
       render(results);
       // Then enrich with live global + local activity (async, best-effort).
       loadActivity(results).catch(() => {});
+    }
+
+    // Decorate a raw game with derived cabinet fields — EXACTLY like app.js.
+    function decorate(game, genre, base, label) {
+      const h = hashStr((game.slug || game.title) + genre.slug);
+      const rating = game.rating != null ? game.rating : 3 + (h % 3);
+      const score = game.score != null ? game.score : 5000 + (h % 1495000);
+      const hot = game.hot != null ? game.hot : ((game.tags || []).some((t) => /classic|retro|arcade/i.test(t)) || h % 5 === 0);
+      return {
+        slug: game.slug, title: game.title, genre: genre.slug, genreLabel: label,
+        icon: ICON[genre.slug] || 'i-arcade', dims: game.dims || '2D',
+        tags: game.tags || [], rating, score, hot,
+        url: game.path ? new URL(game.path, base).href : null, fkey: fKey(genre.slug),
+      };
     }
 
     /* --------------------------------------------------------------- render */
@@ -141,8 +155,8 @@
           ${statCard('…', 'Site Visits', 'g-visits')}
           ${statCard('…', 'Game Plays', 'g-plays')}
         </div>
-        <h3 class="gx-row__title" style="margin:var(--sp-5) 0 var(--sp-3)">Top played games</h3>
-        <div class="gx-bar" id="top-bars"><p class="gx-empty">Loading live counts…</p></div>`);
+        <h3 class="gx-cab__title" style="margin:var(--sp-5) 0 var(--sp-3)">Top Played Games</h3>
+        <div class="gx-bar" id="top-bars"><p class="gx-empty"><h3>LOADING</h3><p>Live counts incoming</p></p></div>`);
 
       // --- (C) Your device (local) ---
       const localVisits = safeLocal('visits');
@@ -153,46 +167,49 @@
           ${statCard(localVisits, 'Your Visits')}
           ${statCard(localPlays, 'Your Plays')}
         </div>
-        <h3 class="gx-row__title" style="margin:var(--sp-5) 0 var(--sp-3)">What you've played</h3>
-        <div class="gx-bar" id="local-bars"><p class="gx-empty">Nothing played on this device yet.</p></div>`);
+        <h3 class="gx-cab__title" style="margin:var(--sp-5) 0 var(--sp-3)">What You've Played</h3>
+        <div class="gx-bar" id="local-bars"><p class="gx-empty"><h3>NO PLAYS YET</h3><p>Nothing played on this device</p></p></div>`);
 
-      // --- Per-genre breakdown (cover-art cards, matches the hub) ---
+      // --- Per-genre breakdown (cabinet cards, matches the hub) ---
       parts.push(sectionTitle('By genre'));
       for (const r of results) {
         const g = r.genre;
         const n = r.games.length;
-        const accent = safeColor(g.color);
-        const countText = r.failed ? 'games.json unavailable' : `${n} game${n === 1 ? '' : 's'}`;
+        const label = g.slug === 'others-games' ? 'CLASSICS' : (g.title || g.slug || 'GENRE').toUpperCase();
+        const countText = r.failed ? 'GAMES.JSON UNAVAILABLE' : `${n} ${n === 1 ? 'CABINET' : 'CABINETS'}`;
         const grid = r.failed || !n
-          ? `<p class="gx-${r.failed ? 'error' : 'empty'}">${r.failed ? 'Manifest unavailable.' : 'Nothing here yet.'}</p>`
-          : `<div class="gx-grid">${r.games.map((game) => coverCard(game, g)).join('')}</div>`;
+          ? `<div class="gx-empty"><h3>${r.failed ? 'MANIFEST UNAVAILABLE' : 'NO CABINETS YET'}</h3><p>${r.failed ? 'Insert a different coin' : 'Check back soon'}</p></div>`
+          : `<div class="gx-grid">${r.games.map(cabinet).join('')}</div>`;
         parts.push(`
-          <section class="gx-row" style="--gx-accent:${accent};margin:var(--sp-5) 0">
-            <div class="gx-row__head">
-              <span class="gx-row__icon"><svg class="gx-ico"><use href="#${ICON[g.slug] || 'i-pad'}"/></svg></span>
-              <span class="gx-row__title">${esc(g.title || g.slug || 'Genre')}</span>
-              <span class="gx-row__count">${countText}</span>
+          <section style="margin:var(--sp-5) 0">
+            <div class="gx-cabhead">
+              <h2>${ico(ICON[g.slug] || 'i-arcade')} ${esc(label)}</h2>
+              <span class="gx-cabhead__count">${esc(countText)}</span>
             </div>
             ${grid}
           </section>`);
       }
 
-      // --- Tag histogram (restyled with gx-bar) ---
+      // --- Tag histogram (styled with gx-bar) ---
       parts.push(sectionTitle('Tags'));
       if (!sortedTags.length) {
-        parts.push(`<p class="gx-empty">No tags found.</p>`);
+        parts.push(`<div class="gx-empty"><h3>NO TAGS FOUND</h3><p>Insert a different coin</p></div>`);
       } else {
         const max = sortedTags[0][1];
-        const rows = sortedTags.map(([tag, count]) => barRow(tag, count, Math.round((count / max) * 100), count)).join('');
+        const rows = sortedTags.map(([tag, count]) => barRow(tag, count, Math.round((count / max) * 100))).join('');
         parts.push(`<div class="gx-bar">${rows}</div>`);
       }
 
       statsEl.innerHTML = parts.join('');
 
-      // Record a play before a cover card navigates to its game (matches the hub).
+      // Record a play before a cabinet navigates to its game (matches the hub).
       statsEl.addEventListener('click', (e) => {
-        const card = e.target.closest('.gx-card[data-slug]');
-        if (card && window.gamfPlay) window.gamfPlay(card.dataset.slug);
+        const cab = e.target.closest('.gx-cabinet[data-slug]');
+        if (!cab) return;
+        const slug = cab.dataset.slug;
+        if (slug && window.gamfPlay) window.gamfPlay(slug);
+        const url = cab.dataset.url;
+        if (url) { e.preventDefault(); window.location.href = url; }
       });
     }
 
@@ -200,17 +217,16 @@
     async function loadActivity(results) {
       const allGames = results.filter((r) => !r.failed).flatMap((r) => r.games);
       const titleBySlug = new Map(allGames.map((g) => [g.slug, g.title || g.slug]));
-      const colorBySlug = new Map(allGames.map((g) => [g.slug, safeColor(g.color || g._genre.color)]));
 
       // --- (C) local plays: render immediately, no network needed ---
-      renderLocalPlays(titleBySlug, colorBySlug);
+      renderLocalPlays(titleBySlug);
 
       // --- (B) global activity (best-effort) ---
       if (!window.gamfStats) {
         setGlobalCard('g-visits', '—');
         setGlobalCard('g-plays', '—');
         const tb = document.getElementById('top-bars');
-        if (tb) tb.innerHTML = `<p class="gx-empty">Live counts are offline.</p>`;
+        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>OFFLINE</h3><p>Live counts unavailable</p></div>`;
         return;
       }
 
@@ -224,72 +240,68 @@
       const slugs = allGames.map((g) => g.slug).filter(Boolean);
       const tb = document.getElementById('top-bars');
       if (!slugs.length) {
-        if (tb) tb.innerHTML = `<p class="gx-empty">No games to rank.</p>`;
+        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>NO GAMES</h3><p>Nothing to rank</p></div>`;
         return;
       }
       let counts;
       try {
         counts = await getGlobalMany(slugs.map((s) => 'play-' + s));
       } catch {
-        if (tb) tb.innerHTML = `<p class="gx-empty">Live counts are offline.</p>`;
+        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>OFFLINE</h3><p>Live counts unavailable</p></div>`;
         return;
       }
       const ranked = slugs
-        .map((s) => ({ slug: s, title: titleBySlug.get(s) || s, color: colorBySlug.get(s), n: counts['play-' + s] }))
+        .map((s) => ({ slug: s, title: titleBySlug.get(s) || s, n: counts['play-' + s] }))
         .filter((x) => typeof x.n === 'number' && x.n > 0)
         .sort((a, b) => b.n - a.n)
         .slice(0, 10);
 
       if (!tb) return;
       if (!ranked.length) {
-        tb.innerHTML = `<p class="gx-empty">No plays recorded yet — be the first!</p>`;
+        tb.innerHTML = `<div class="gx-empty"><h3>NO PLAYS YET</h3><p>Be the first to play</p></div>`;
         return;
       }
       const max = ranked[0].n;
       tb.innerHTML = ranked.map((x) =>
-        barRow(x.title, fmtNum(x.n), Math.max(4, Math.round((x.n / max) * 100)), x.n, x.color)
+        barRow(x.title, fmtNum(x.n), Math.max(4, Math.round((x.n / max) * 100)))
       ).join('');
     }
 
-    function renderLocalPlays(titleBySlug, colorBySlug) {
+    function renderLocalPlays(titleBySlug) {
       const lb = document.getElementById('local-bars');
       if (!lb) return;
       const plays = (window.gamfStats && window.gamfStats.localPlays && window.gamfStats.localPlays()) || {};
       const entries = Object.entries(plays)
-        .map(([slug, n]) => ({ slug, title: titleBySlug.get(slug) || slug, color: colorBySlug.get(slug), n: +n || 0 }))
+        .map(([slug, n]) => ({ slug, title: titleBySlug.get(slug) || slug, n: +n || 0 }))
         .filter((x) => x.n > 0)
         .sort((a, b) => b.n - a.n);
       if (!entries.length) {
-        lb.innerHTML = `<p class="gx-empty">Nothing played on this device yet.</p>`;
+        lb.innerHTML = `<div class="gx-empty"><h3>NO PLAYS YET</h3><p>Nothing played on this device</p></div>`;
         return;
       }
       const max = entries[0].n;
       lb.innerHTML = entries.map((x) =>
-        barRow(x.title, x.n, Math.max(4, Math.round((x.n / max) * 100)), x.n, x.color)
+        barRow(x.title, x.n, Math.max(4, Math.round((x.n / max) * 100)))
       ).join('');
     }
 
     /* ----------------------------------------------------------- templates */
-    // Same cover-art card markup as the hub. Renders as a launch link so a tap
-    // records a play (window.gamfPlay) before navigating to the game.
-    function coverCard(game, genre) {
-      const cover = safeColor(game.color || genre.color);
-      const glyph = esc(game.icon || genre.icon || '🎮');
-      const meta = (game.tags || []).slice(0, 3).map(esc).join(' · ');
-      const href = game._url ? ` href="${esc(game._url)}"` : '';
-      const slug = game.slug ? ` data-slug="${esc(game.slug)}"` : '';
-      return `
-        <a class="gx-card"${href}${slug}>
-          <div class="gx-cover" style="--cover:${cover}">
-            ${game.dims ? `<span class="gx-cover__dims">${esc(game.dims)}</span>` : ''}
-            <span class="gx-cover__glyph">${glyph}</span>
-            <span class="gx-cover__play"><svg class="gx-ico"><use href="#i-play"/></svg></span>
-          </div>
-          <div class="gx-card__body">
-            <span class="gx-card__title">${esc(game.title || game.slug || '?')}</span>
-            ${meta ? `<span class="gx-card__meta">${meta}</span>` : ''}
-          </div>
-        </a>`;
+    // Cabinet card — markup copied from app.js cabinet(), so a tap records a
+    // play (window.gamfPlay) before navigating to the game.
+    function ratingTicks(r) { let s = ''; for (let i = 0; i < 5; i++) s += `<span class="${i < r ? 'on' : ''}"></span>`; return `<div class="gx-rate">${s}</div>`; }
+    function cabinet(g) {
+      const data = `data-slug="${esc(g.slug || '')}"${g.url ? ` data-url="${esc(g.url)}"` : ''}`;
+      return `<button class="gx-cabinet" ${data} aria-label="Play ${esc(g.title)}, ${esc(g.genreLabel)}">
+        <div class="gx-cab__plate">${ico(g.icon)}<span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
+        <div class="gx-cab__cover${g.hot ? ' is-hot' : ''}">
+          <span class="gx-cab__big">${ico(g.icon)}</span>
+          ${g.hot ? `<span class="gx-cab__hot">${ico('i-bolt')} Hot</span>` : ''}
+          <h3 class="gx-cab__title">${esc(String(g.title).toUpperCase())}</h3>
+        </div>
+        <div class="gx-cab__ctrl">
+          <div style="min-width:0">${ratingTicks(g.rating)}<span class="gx-cab__hi">HI ${fmtNum(g.score)}</span></div>
+          <span class="gx-cab__play">${ico('i-play')} Play</span>
+        </div></button>`;
     }
 
     function sectionTitle(t) { return `<h2 class="gx-section-title">${esc(t)}</h2>`; }
@@ -308,13 +320,11 @@
     }
 
     // gx-bar row: label (left), track+fill (middle), value (right).
-    // An optional accent recolours just this row's fill (per-genre cover colour).
-    function barRow(label, valueText, pct, _v, accent) {
-      const fillStyle = `width:${pct}%${accent ? `;--gx-accent:${accent}` : ''}`;
+    function barRow(label, valueText, pct) {
       return `
         <div class="gx-bar__row">
-          <span class="gx-bar__name" title="${esc(label)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label)}</span>
-          <span class="gx-bar__track"><span class="gx-bar__fill" style="${fillStyle}"></span></span>
+          <span title="${esc(label)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label)}</span>
+          <span class="gx-bar__track"><span class="gx-bar__fill" style="width:${pct}%"></span></span>
           <span class="gx-bar__val">${esc(valueText)}</span>
         </div>`;
     }
@@ -332,17 +342,13 @@
 
     function fmtNum(v) {
       if (v == null || typeof v !== 'number' || Number.isNaN(v)) return '—';
-      return v.toLocaleString();
+      return v.toLocaleString('en-US');
     }
 
     async function fetchJSON(url) {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
-    }
-
-    function safeColor(c) {
-      return /^#[0-9a-fA-F]{3,8}$/.test(String(c)) ? c : '#7c5cff';
     }
 
     function esc(s = '') {
