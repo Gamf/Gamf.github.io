@@ -3,61 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#07080c">
-  <title>Gamf — touch games</title>
-  <meta name="description" content="A hand-picked collection of touch-first browser games. Free, open-source, no installs.">
+  <meta name="theme-color" content="#15110e">
+  <title>Gamf Arcade — touch games</title>
+  <meta name="description" content="GAMF Arcade — a hand-picked collection of touch-first, open-source browser games. Insert coin.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="gamf.css">
 </head>
 <body class="gx">
   <script src="gamf-icons.js"></script>
   <script src="gamf-stats.js"></script>
+  <div class="gx-vignette" aria-hidden="true"></div>
 
   <nav class="gx-nav">
+    <div class="gx-nav__bar"></div>
     <div class="gx-nav__inner">
-      <a class="gx-logo" href="./">
-        <span class="gx-logo__mark"><svg class="gx-ico"><use href="#i-logo"/></svg></span>
-        Gamf
+      <a class="gx-logo" href="#top">
+        <span class="gx-logo__mark">G</span>
+        <span class="gx-logo__word">GAMF</span>
       </a>
       <span class="gx-nav__spacer"></span>
-      <div class="gx-nav__links">
-        <a class="gx-btn gx-btn--ghost gx-btn--sm" href="stats.html"><svg class="gx-ico"><use href="#i-stats"/></svg> Stats</a>
+      <div class="gx-search" id="search">
+        <svg class="gx-ico"><use href="#i-search"/></svg>
+        <input id="q" type="text" placeholder="SEARCH CABINETS" spellcheck="false" aria-label="Search game cabinets">
+        <button class="gx-search__clear" id="qclear" aria-label="Clear search"><svg class="gx-ico"><use href="#i-x"/></svg></button>
+      </div>
+      <a class="gx-hiscores" href="#scores"><svg class="gx-ico"><use href="#i-trophy"/></svg> Hi-Scores</a>
+    </div>
+    <div class="gx-marquee">
+      <div class="gx-marquee__track">
+        <span>&nbsp;&nbsp;New High Score — ACE 1,284,500 on Asteroids&nbsp;&nbsp;/&nbsp;&nbsp;Now Playing: Cube Runner&nbsp;&nbsp;/&nbsp;&nbsp;20 Cabinets Online&nbsp;&nbsp;/&nbsp;&nbsp;Free Play All Night&nbsp;&nbsp;/&nbsp;&nbsp;Insert Coin To Continue&nbsp;&nbsp;/&nbsp;&nbsp;Open Source · Touch First&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+        <span aria-hidden="true">New High Score — ACE 1,284,500 on Asteroids&nbsp;&nbsp;/&nbsp;&nbsp;Now Playing: Cube Runner&nbsp;&nbsp;/&nbsp;&nbsp;20 Cabinets Online&nbsp;&nbsp;/&nbsp;&nbsp;Free Play All Night&nbsp;&nbsp;/&nbsp;&nbsp;Insert Coin To Continue&nbsp;&nbsp;/&nbsp;&nbsp;Open Source · Touch First&nbsp;&nbsp;/&nbsp;&nbsp;</span>
       </div>
     </div>
   </nav>
 
-  <div class="gx-wrap">
-    <!-- Hero (featured game, chosen at runtime) -->
-    <section class="gx-hero" id="hero" hidden>
-      <div class="gx-hero__art"></div>
-      <div class="gx-hero__glyph" id="hero-glyph">🎮</div>
-      <div class="gx-hero__body">
-        <span class="gx-hero__eyebrow"><svg class="gx-ico" style="width:1em;height:1em"><use href="#i-trophy"/></svg> Featured</span>
-        <h1 class="gx-hero__title" id="hero-title">Gamf</h1>
-        <p class="gx-hero__sub" id="hero-sub">Touch-first browser games.</p>
-        <a class="gx-btn gx-btn--primary" id="hero-play" href="#"><svg class="gx-ico"><use href="#i-play"/></svg> Play now</a>
+  <div id="top" class="gx-wrap">
+    <section class="gx-hero" id="hero" hidden></section>
+
+    <div id="scores" class="gx-cabsec">
+      <div class="gx-cabs">
+        <div class="gx-cabhead">
+          <h2>GAME CABINETS</h2>
+          <span class="gx-cabhead__count" id="count">Loading…</span>
+        </div>
+        <div class="gx-pills" id="pills"></div>
+        <div class="gx-grid" id="grid">
+          <div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div>
+        </div>
+        <div id="empty"></div>
       </div>
-    </section>
 
-    <header style="text-align:center;margin:8px 0 4px">
-      <div class="gx-brandline">GAMF</div>
-      <p style="color:var(--gx-text-2);margin:6px 0 0" id="tagline">Open-source games, made for your fingers.</p>
-    </header>
+      <aside class="gx-board">
+        <div class="gx-board__head">
+          <svg class="gx-ico"><use href="#i-trophy"/></svg>
+          <h2>HIGH SCORES</h2>
+          <span class="gx-board__cursor"></span>
+        </div>
+        <div class="gx-board__rows" id="leaders"></div>
+      </aside>
+    </div>
 
-    <main id="rows">
-      <div class="gx-row">
-        <div class="gx-row__head"><span class="gx-row__title">Loading…</span></div>
-        <div class="gx-scroller">
-          <div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div>
+    <footer class="gx-foot">
+      <div class="gx-foot__bar"></div>
+      <div class="gx-foot__grid">
+        <div class="gx-foot__coin">
+          <div class="gx-foot__slot"><span class="s"></span><span class="c">25¢</span></div>
+          <div>
+            <span class="gx-foot__cap">INSERT COIN</span>
+            <span class="gx-foot__sub">Credits 00 · Free Play</span>
+          </div>
+        </div>
+        <div class="gx-foot__meta">
+          <span>Open Source · Touch First · MIT</span>
+          <span>Hosted On GitHub Pages</span>
+          <span class="dim">© 1986–2026 GAMF Arcade</span>
         </div>
       </div>
-    </main>
+      <div class="gx-press">Press Start</div>
+    </footer>
   </div>
 
-  <footer class="gx-foot gx-wrap">Open-source · touch-first · hosted on GitHub Pages</footer>
+  <div class="gx-launch" id="launch" role="button" aria-label="Skip"></div>
 
   <script type="module" src="app.js"></script>
 </body>
