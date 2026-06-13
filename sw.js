@@ -6,6 +6,7 @@ const CACHE_VERSION = 'gamf-hub-v1';
 const SHELL = [
   './',
   'index.html',
+  'stats.html',
   'styles.css',
   'app.js',
   'genres.json',

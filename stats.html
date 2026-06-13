@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0e0f13">
+  <title>Gamf — stats</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* stats.html page-specific styles. Builds on styles.css (dark theme). */
+    .stats-header { padding: 28px 4px 4px; text-align: center; }
+    .stats-header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 8vw, 2.8rem);
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #6c8cff, #5ad1a8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 14px 0 0;
+      color: #9aa0ad; text-decoration: none;
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      border: 1px solid #242838; border-radius: 999px;
+      background: #181b24;
+      min-height: 40px;
+    }
+    .back-link:active { transform: scale(0.97); }
+
+    .section-title {
+      font-size: 1.1rem; margin: 28px 2px 12px;
+      color: #c7ccd6; font-weight: 600;
+    }
+
+    /* Big headline numbers */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .stat-card {
+      background: #181b24;
+      border: 1px solid #242838;
+      border-radius: 16px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: clamp(2rem, 9vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.05;
+      background: linear-gradient(90deg, #6c8cff, #5ad1a8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .stat-label { margin-top: 6px; color: #9aa0ad; font-size: 0.82rem; letter-spacing: 0.02em; }
+
+    /* Per-genre breakdown */
+    .genre-stat {
+      background: #181b24;
+      border: 1px solid #242838;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .genre-stat-head {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.1rem; font-weight: 600;
+    }
+    .genre-stat-head .icon { font-size: 1.4rem; }
+    .genre-stat-head .count {
+      margin-left: auto; color: #7d8493; font-size: 0.85rem; font-weight: 400;
+    }
+    .genre-stat-head .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .genre-games {
+      margin: 10px 0 0; padding: 0; list-style: none;
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .genre-games li {
+      background: #11131b; border: 1px solid #242838;
+      border-radius: 999px; padding: 5px 12px;
+      font-size: 0.82rem; color: #c7ccd6;
+    }
+    .genre-stat.failed .genre-stat-head .count { color: #ff8f80; }
+
+    /* Tag histogram */
+    .tag-bars { display: flex; flex-direction: column; gap: 8px; }
+    .tag-row {
+      display: grid;
+      grid-template-columns: minmax(72px, 110px) 1fr auto;
+      align-items: center; gap: 10px;
+      font-size: 0.85rem;
+    }
+    .tag-name { color: #c7ccd6; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag-bar-track {
+      background: #11131b; border: 1px solid #242838;
+      border-radius: 999px; height: 18px; overflow: hidden;
+    }
+    .tag-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6c8cff, #5ad1a8);
+      border-radius: 999px;
+      min-width: 4px;
+      transition: width 0.4s ease;
+    }
+    .tag-count { color: #9aa0ad; font-variant-numeric: tabular-nums; min-width: 1.5em; text-align: right; }
+
+    .notice { color: #7d8493; font-size: 0.85rem; padding: 4px 2px; }
+    .notice.warn { color: #ffb86c; }
+    .notice.error { color: #ff8f80; }
+  </style>
+</head>
+<body class="safe">
+  <header class="stats-header">
+    <h1>Gamf Stats</h1>
+    <a class="back-link" href="./">← Back to Gamf</a>
+  </header>
+
+  <main id="stats">
+    <p class="notice" id="loading">Loading stats…</p>
+  </main>
+
+  <footer class="hub-footer">
+    <span>Open-source · touch-first · hosted on GitHub Pages</span>
+  </footer>
+
+  <script type="module">
+    // stats.html — computes aggregate stats across all genres.
+    // Mirrors app.js: fetch genres.json, then each genre's games.json same-origin,
+    // resolving each genre base relative to this page via new URL(base, document.baseURI).
+
+    const statsEl = document.getElementById('stats');
+
+    init();
+
+    async function init() {
+      let config;
+      try {
+        config = await fetchJSON('genres.json');
+      } catch (err) {
+        statsEl.innerHTML = `<p class="notice error">Couldn't load genres.json — ${escapeHtml(err.message)}</p>`;
+        return;
+      }
+
+      const genres = config.genres || [];
+
+      // Fetch every genre's games.json in parallel. A failed fetch resolves to
+      // { genre, games: [], failed: true } so one bad genre doesn't break the page.
+      const results = await Promise.all(genres.map(async (genre) => {
+        const base = new URL(genre.base, document.baseURI);
+        try {
+          const manifest = await fetchJSON(new URL('games.json', base));
+          return { genre, games: manifest.games || [], failed: false };
+        } catch (err) {
+          return { genre, games: [], failed: true, error: err.message };
+        }
+      }));
+
+      render(results);
+    }
+
+    function render(results) {
+      const ok = results.filter((r) => !r.failed);
+      const failed = results.filter((r) => r.failed);
+      const allGames = ok.flatMap((r) => r.games);
+
+      // Headline numbers.
+      const totalGenres = results.length;
+      const totalGames = allGames.length;
+      const count2D = allGames.filter((g) => String(g.dims).toUpperCase() === '2D').length;
+      const count3D = allGames.filter((g) => String(g.dims).toUpperCase() === '3D').length;
+
+      // Tag histogram (tag -> count), sorted by count desc then name.
+      const tagCounts = new Map();
+      for (const g of allGames) {
+        for (const tag of (g.tags || [])) {
+          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+        }
+      }
+      const distinctTags = tagCounts.size;
+      const sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+      const maxTag = sortedTags.length ? sortedTags[0][1] : 1;
+
+      const parts = [];
+
+      // --- Headline numbers ---
+      parts.push(`
+        <div class="stat-grid">
+          ${statCard(totalGenres, totalGenres === 1 ? 'Genre' : 'Genres')}
+          ${statCard(totalGames, totalGames === 1 ? 'Game' : 'Games')}
+          ${statCard(count2D, '2D Games')}
+          ${statCard(count3D, '3D Games')}
+          ${statCard(distinctTags, distinctTags === 1 ? 'Distinct Tag' : 'Distinct Tags')}
+        </div>`);
+
+      if (failed.length) {
+        const names = failed.map((r) => escapeHtml(r.genre.title || r.genre.slug)).join(', ');
+        parts.push(`<p class="notice warn">Skipped ${failed.length} genre${failed.length === 1 ? '' : 's'} whose games.json failed to load: ${names}.</p>`);
+      }
+
+      // --- Per-genre breakdown ---
+      parts.push(`<h2 class="section-title">By genre</h2>`);
+      for (const r of results) {
+        const g = r.genre;
+        const n = r.games.length;
+        const countText = r.failed
+          ? 'games.json unavailable'
+          : `${n} game${n === 1 ? '' : 's'}`;
+        const gamesList = r.failed || !n
+          ? ''
+          : `<ul class="genre-games">${r.games.map((game) => `<li>${escapeHtml(game.title || game.slug || '?')}</li>`).join('')}</ul>`;
+        parts.push(`
+          <div class="genre-stat${r.failed ? ' failed' : ''}">
+            <div class="genre-stat-head">
+              <span class="dot" style="background:${cssColor(g.color)}"></span>
+              <span class="icon">${escapeHtml(g.icon || '🎮')}</span>
+              <span>${escapeHtml(g.title || g.slug || 'Genre')}</span>
+              <span class="count">${countText}</span>
+            </div>
+            ${gamesList}
+          </div>`);
+      }
+
+      // --- Tag histogram ---
+      parts.push(`<h2 class="section-title">Tags</h2>`);
+      if (!sortedTags.length) {
+        parts.push(`<p class="notice">No tags found.</p>`);
+      } else {
+        const rows = sortedTags.map(([tag, count]) => {
+          const pct = Math.round((count / maxTag) * 100);
+          return `
+            <div class="tag-row">
+              <span class="tag-name" title="${escapeHtml(tag)}">${escapeHtml(tag)}</span>
+              <span class="tag-bar-track"><span class="tag-bar-fill" style="width:${pct}%"></span></span>
+              <span class="tag-count">${count}</span>
+            </div>`;
+        }).join('');
+        parts.push(`<div class="tag-bars">${rows}</div>`);
+      }
+
+      statsEl.innerHTML = parts.join('');
+    }
+
+    function statCard(number, label) {
+      return `
+        <div class="stat-card">
+          <div class="stat-number">${number}</div>
+          <div class="stat-label">${escapeHtml(label)}</div>
+        </div>`;
+    }
+
+    async function fetchJSON(url) {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    function cssColor(c) {
+      // Only allow simple hex colours from config; fall back otherwise.
+      return /^#[0-9a-fA-F]{3,8}$/.test(String(c)) ? c : '#2a2f42';
+    }
+
+    function escapeHtml(s = '') {
+      return String(s).replace(/[&<>"']/g, (c) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
+    }
+
+    // Register the service worker for offline/installable behaviour.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
