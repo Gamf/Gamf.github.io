@@ -6,6 +6,7 @@
     { "slug": "arcade",  "title": "Arcade",  "icon": "🕹️",  "color": "#ff7a6c", "base": "../arcade/" },
     { "slug": "3d",      "title": "3D",      "icon": "🎲",  "color": "#5ad1a8", "base": "../3d/" },
     { "slug": "fps",     "title": "FPS",     "icon": "🎯",  "color": "#e0556b", "base": "../fps/" },
-    { "slug": "racing",  "title": "Racing",  "icon": "🏎️",  "color": "#f2c14e", "base": "../racing/" }
+    { "slug": "racing",  "title": "Racing",  "icon": "🏎️",  "color": "#f2c14e", "base": "../racing/" },
+    { "slug": "others-games", "title": "Others' Games", "icon": "🌍", "color": "#9b8cff", "base": "../others-games/" }
   ]
 }
