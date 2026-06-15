@@ -305,7 +305,7 @@
       const tag = g.url ? 'a' : 'button';
       const href = g.url ? ` href="${esc(g.url)}"` : '';
       return `<${tag} class="gx-cabinet" ${data}${href}>
-        <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}</div>
+        <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}${g.url ? `<img class="gx-cab__img" src="${g.url + 'thumb.svg'}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
         <div class="gx-cab__body">
           <div class="gx-cab__plate"><span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
           <h3 class="gx-cab__title">${esc(g.title)}</h3>
