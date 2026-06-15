@@ -66,6 +66,11 @@
     const statsEl = document.getElementById('stats');
     const countEl = document.getElementById('count');
 
+    // warm cover tints — varied per game from its slug (the catalogue's coloured plates)
+    const TINTS = ['#e7dcc2', '#e3cfa6', '#dcc7a3', '#cdbf9f', '#dbcaa0', '#e0c79a', '#d8b48a', '#cdb892'];
+    const hsh = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+    const tint = (s) => TINTS[hsh(s || '') % TINTS.length];
+
     function ico(id) { return `<svg class="gx-ico"><use href="#${id}"/></svg>`; }
     // The reader's REAL local best for a game — same key app.js writes.
     function bestOf(genre, slug) { try { return +(localStorage.getItem(`gamf-${genre}-${slug}-best`)) || 0; } catch { return 0; } }

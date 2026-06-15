@@ -8,6 +8,10 @@ const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;
 const fmt = (n) => Number(n).toLocaleString('en-US');
 const ico = (id) => `<svg class="gx-ico"><use href="#${id}"/></svg>`;
 const bestOf = (genre, slug) => { try { return +(localStorage.getItem(`gamf-${genre}-${slug}-best`)) || 0; } catch { return 0; } };
+// warm cover tints — varied per game from its slug (the catalogue's coloured plates)
+const TINTS = ['#e7dcc2', '#e3cfa6', '#dcc7a3', '#cdbf9f', '#dbcaa0', '#e0c79a', '#d8b48a', '#cdb892'];
+const hsh = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+const tint = (s) => TINTS[hsh(s || '') % TINTS.length];
 
 // one editor's voice, per genre — concrete, not "supercharge your gameplay"
 const BLURB = {
@@ -120,9 +124,12 @@ function render() {
 function entry(g) {
   const meta = g.best > 0 ? `Best ${fmt(g.best)}` : (g.tags.slice(0, 2).join(', ') || g.dims);
   return `<a class="gx-cabinet" href="${g.url}">
-    <div class="gx-cab__plate">${ico(g.icon)}<span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
-    <h3 class="gx-cab__title">${esc(g.title)}</h3>
-    <div class="gx-cab__ctrl"><span class="gx-cab__hi">${esc(meta)}</span><span class="gx-cab__play">Play</span></div>
+    <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}</div>
+    <div class="gx-cab__body">
+      <div class="gx-cab__plate"><span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
+      <h3 class="gx-cab__title">${esc(g.title)}</h3>
+      <div class="gx-cab__ctrl"><span class="gx-cab__hi">${esc(meta)}</span><span class="gx-cab__play">Play</span></div>
+    </div>
   </a>`;
 }
 
