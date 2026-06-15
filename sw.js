@@ -10,6 +10,7 @@ const SHELL = [
   'gamf.css',
   'gamf-icons.js',
   'gamf-stats.js',
+  'gamf-controls.js',
   'app.js',
   'genres.json',
   'manifest.webmanifest'
