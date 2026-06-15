@@ -123,8 +123,9 @@ function render() {
 }
 function entry(g) {
   const meta = g.best > 0 ? `Best ${fmt(g.best)}` : (g.tags.slice(0, 2).join(', ') || g.dims);
+  const thumb = g.genre === 'others-games' ? '' : g.url + 'thumb.svg';
   return `<a class="gx-cabinet" href="${g.url}">
-    <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}</div>
+    <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}${thumb ? `<img class="gx-cab__img" src="${thumb}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
     <div class="gx-cab__body">
       <div class="gx-cab__plate"><span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
       <h3 class="gx-cab__title">${esc(g.title)}</h3>
