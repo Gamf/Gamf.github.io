@@ -3,39 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#15110e">
-  <title>Gamf Arcade — touch games</title>
-  <meta name="description" content="GAMF Arcade — a hand-picked collection of touch-first, open-source browser games. Insert coin.">
+  <meta name="theme-color" content="#efe6d2">
+  <title>GAMF Quarterly — a small catalogue of games for your thumbs</title>
+  <meta name="description" content="GAMF Quarterly: a hand-set catalogue of small, free, open-source games you can play in a browser. Set in oxblood on cream.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="gamf.css">
 </head>
 <body class="gx">
   <script src="gamf-icons.js"></script>
   <script src="gamf-stats.js"></script>
-  <div class="gx-vignette" aria-hidden="true"></div>
 
   <nav class="gx-nav">
-    <div class="gx-nav__bar"></div>
     <div class="gx-nav__inner">
-      <a class="gx-logo" href="#top">
-        <span class="gx-logo__mark">G</span>
-        <span class="gx-logo__word">GAMF</span>
-      </a>
+      <a class="gx-logo" href="#top">GAMF</a>
       <span class="gx-nav__spacer"></span>
       <div class="gx-search" id="search">
         <svg class="gx-ico"><use href="#i-search"/></svg>
-        <input id="q" type="text" placeholder="SEARCH CABINETS" spellcheck="false" aria-label="Search game cabinets">
+        <input id="q" type="text" placeholder="look something up" spellcheck="false" aria-label="Search the catalogue">
         <button class="gx-search__clear" id="qclear" aria-label="Clear search"><svg class="gx-ico"><use href="#i-x"/></svg></button>
       </div>
-      <a class="gx-hiscores" href="#scores"><svg class="gx-ico"><use href="#i-trophy"/></svg> Hi-Scores</a>
+      <a class="gx-hiscores" href="#scores">your scores</a>
     </div>
     <div class="gx-marquee">
       <div class="gx-marquee__track">
-        <span>&nbsp;&nbsp;New High Score — ACE 1,284,500 on Asteroids&nbsp;&nbsp;/&nbsp;&nbsp;Now Playing: Cube Runner&nbsp;&nbsp;/&nbsp;&nbsp;20 Cabinets Online&nbsp;&nbsp;/&nbsp;&nbsp;Free Play All Night&nbsp;&nbsp;/&nbsp;&nbsp;Insert Coin To Continue&nbsp;&nbsp;/&nbsp;&nbsp;Open Source · Touch First&nbsp;&nbsp;/&nbsp;&nbsp;</span>
-        <span aria-hidden="true">New High Score — ACE 1,284,500 on Asteroids&nbsp;&nbsp;/&nbsp;&nbsp;Now Playing: Cube Runner&nbsp;&nbsp;/&nbsp;&nbsp;20 Cabinets Online&nbsp;&nbsp;/&nbsp;&nbsp;Free Play All Night&nbsp;&nbsp;/&nbsp;&nbsp;Insert Coin To Continue&nbsp;&nbsp;/&nbsp;&nbsp;Open Source · Touch First&nbsp;&nbsp;/&nbsp;&nbsp;</span>
+        <span>Issue Nº&nbsp;7 · <b id="dl-count">—</b> games in the rack · free play, always · no accounts, no ads · set in oxblood on cream.</span>
       </div>
     </div>
   </nav>
@@ -46,12 +40,12 @@
     <div id="scores" class="gx-cabsec">
       <div class="gx-cabs">
         <div class="gx-cabhead">
-          <h2>GAME CABINETS</h2>
-          <span class="gx-cabhead__count" id="count">Loading…</span>
+          <h2>The Catalogue</h2>
+          <span class="gx-cabhead__count" id="count">setting type…</span>
         </div>
         <div class="gx-pills" id="pills"></div>
         <div class="gx-grid" id="grid">
-          <div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div>
+          <div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div><div class="gx-skel"></div>
         </div>
         <div id="empty"></div>
       </div>
@@ -59,30 +53,17 @@
       <aside class="gx-board">
         <div class="gx-board__head">
           <svg class="gx-ico"><use href="#i-trophy"/></svg>
-          <h2>HIGH SCORES</h2>
-          <span class="gx-board__cursor"></span>
+          <h2>Your Best</h2>
         </div>
         <div class="gx-board__rows" id="leaders"></div>
       </aside>
     </div>
 
     <footer class="gx-foot">
-      <div class="gx-foot__bar"></div>
-      <div class="gx-foot__grid">
-        <div class="gx-foot__coin">
-          <div class="gx-foot__slot"><span class="s"></span><span class="c">25¢</span></div>
-          <div>
-            <span class="gx-foot__cap">INSERT COIN</span>
-            <span class="gx-foot__sub">Credits 00 · Free Play</span>
-          </div>
-        </div>
-        <div class="gx-foot__meta">
-          <span>Open Source · Touch First · MIT</span>
-          <span>Hosted On GitHub Pages</span>
-          <span class="dim">© 1986–2026 GAMF Arcade</span>
-        </div>
+      <div class="gx-foot__meta">
+        <p>GAMF Quarterly is a one-person catalogue of small games — all free, all open-source, all playable with a thumb. Nothing here phones home.</p>
+        <p class="dim">Set in Fraunces &amp; Newsreader · hosted on GitHub Pages · the borrowed games keep their own authors &amp; licences.</p>
       </div>
-      <div class="gx-press">Press Start</div>
     </footer>
   </div>
 
