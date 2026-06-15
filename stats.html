@@ -294,7 +294,8 @@
     }
 
     /* ----------------------------------------------------------- templates */
-    // Catalogue entry — markup copied from app.js entry(): a plate (icon + genre
+    // Catalogue entry — markup copied from app.js entry(): a cover-plate thumb
+    // (genre line-icon over a slug-tinted plate), then a body with a plate (genre
     // + dims), a title, and a control row showing the reader's REAL local best,
     // or a couple of tags / the dims when there is none. A tap records a play
     // (window.gamfPlay) before navigating to the game.
@@ -304,9 +305,12 @@
       const tag = g.url ? 'a' : 'button';
       const href = g.url ? ` href="${esc(g.url)}"` : '';
       return `<${tag} class="gx-cabinet" ${data}${href}>
-        <div class="gx-cab__plate">${ico(g.icon)}<span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
-        <h3 class="gx-cab__title">${esc(g.title)}</h3>
-        <div class="gx-cab__ctrl"><span class="gx-cab__hi">${esc(meta)}</span><span class="gx-cab__play">Play</span></div>
+        <div class="gx-cab__thumb" style="--cover:${tint(g.slug)}">${ico(g.icon)}</div>
+        <div class="gx-cab__body">
+          <div class="gx-cab__plate"><span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
+          <h3 class="gx-cab__title">${esc(g.title)}</h3>
+          <div class="gx-cab__ctrl"><span class="gx-cab__hi">${esc(meta)}</span><span class="gx-cab__play">Play</span></div>
+        </div>
       </${tag}>`;
     }
 
