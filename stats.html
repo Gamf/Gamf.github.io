@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#15110e">
-  <title>Gamf Arcade — stats</title>
-  <meta name="description" content="Live catalog, visit and play stats for the Gamf Arcade touch-game portal.">
+  <meta name="theme-color" content="#efe6d2">
+  <title>GAMF Quarterly — the ledger</title>
+  <meta name="description" content="GAMF Quarterly's ledger: the live catalogue counts, global play activity, and what you've played on this device. No fabricated numbers.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,51 +15,60 @@
 <body class="gx">
   <script src="gamf-icons.js"></script>
   <script src="gamf-stats.js"></script>
-  <div class="gx-vignette" aria-hidden="true"></div>
 
   <nav class="gx-nav">
-    <div class="gx-nav__bar"></div>
     <div class="gx-nav__inner">
-      <a class="gx-logo" href="./">
-        <span class="gx-logo__mark">G</span>
-        <span class="gx-logo__word">GAMF</span>
-      </a>
+      <a class="gx-logo" href="./">GAMF</a>
       <span class="gx-nav__spacer"></span>
-      <a class="gx-back" href="./"><svg class="gx-ico"><use href="#i-back"/></svg> Hub</a>
+      <a class="gx-back" href="./">← the rack</a>
+    </div>
+    <div class="gx-marquee">
+      <div class="gx-marquee__track">
+        <span>The ledger · live counts only · what the press has set, what readers have played, and what you have played here.</span>
+      </div>
     </div>
   </nav>
 
   <div class="gx-wrap">
-    <h1 class="gx-section-title"><svg class="gx-ico"><use href="#i-stats"/></svg> Stats</h1>
+    <div class="gx-cabhead">
+      <h2>The Ledger</h2>
+      <span class="gx-cabhead__count" id="count">counting up…</span>
+    </div>
 
     <main id="stats">
       <div class="gx-stats-grid" aria-hidden="true">
-        <div class="gx-skel" style="min-height:0;height:110px"></div>
-        <div class="gx-skel" style="min-height:0;height:110px"></div>
-        <div class="gx-skel" style="min-height:0;height:110px"></div>
-        <div class="gx-skel" style="min-height:0;height:110px"></div>
+        <div class="gx-skel" style="min-height:0;height:96px"></div>
+        <div class="gx-skel" style="min-height:0;height:96px"></div>
+        <div class="gx-skel" style="min-height:0;height:96px"></div>
+        <div class="gx-skel" style="min-height:0;height:96px"></div>
       </div>
-      <p class="gx-empty" id="loading"><h3>LOADING STATS</h3><p>Insert coin</p></p>
     </main>
+
+    <footer class="gx-foot">
+      <div class="gx-foot__meta">
+        <p>GAMF Quarterly is a one-person catalogue of small games — all free, all open-source, all playable with a thumb. Nothing here phones home except these plain counters.</p>
+        <p class="dim">Set in Fraunces &amp; Newsreader · hosted on GitHub Pages · the borrowed games keep their own authors &amp; licences.</p>
+      </div>
+    </footer>
   </div>
 
-  <footer class="gx-foot-note">Open Source · Touch First · Hosted On GitHub Pages</footer>
-
   <script type="module">
-    // stats.html — live catalog + activity dashboard for the Gamf Arcade portal.
-    // Mirrors app.js: fetch genres.json, then each genre's games.json same-origin,
-    // resolving each genre base relative to this page via new URL(base, document.baseURI).
-    // Cabinet rating / HI score / hot are derived EXACTLY like app.js so the numbers
-    // match the homepage. Global activity comes from window.gamfStats (Abacus
-    // counters); per-device figures come from localStorage. Both degrade to '—'.
+    // stats.html — GAMF Quarterly's ledger. Mirrors app.js: fetch genres.json,
+    // then each genre's games.json same-origin, resolving each genre base relative
+    // to this page via new URL(base, document.baseURI). All figures are REAL:
+    //   • catalogue totals are counted from the manifests;
+    //   • global activity comes from window.gamfStats (Abacus counters);
+    //   • per-device figures come from localStorage;
+    //   • per-game "best" is the reader's own localStorage best — nothing fabricated.
 
     const ICON = { puzzle: 'i-puzzle', arcade: 'i-arcade', '3d': 'i-cube', fps: 'i-target', racing: 'i-flag', 'others-games': 'i-coin' };
     const fKey = (slug) => (slug === 'others-games' ? 'classics' : slug);
     const statsEl = document.getElementById('stats');
+    const countEl = document.getElementById('count');
 
-    function ico(id, cls) { return `<svg class="gx-ico${cls ? ' ' + cls : ''}"><use href="#${id}"/></svg>`; }
-    // Verbatim hash from app.js — must match so ratings/scores/hot line up.
-    function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+    function ico(id) { return `<svg class="gx-ico"><use href="#${id}"/></svg>`; }
+    // The reader's REAL local best for a game — same key app.js writes.
+    function bestOf(genre, slug) { try { return +(localStorage.getItem(`gamf-${genre}-${slug}-best`)) || 0; } catch { return 0; } }
 
     // Count this page view as a site visit (global + local).
     if (window.gamfVisit) window.gamfVisit();
@@ -71,7 +80,8 @@
       try {
         config = await fetchJSON('genres.json');
       } catch (err) {
-        statsEl.innerHTML = `<p class="gx-error">Couldn't load genres.json — ${esc(err.message)}</p>`;
+        countEl.textContent = 'the press jammed';
+        statsEl.innerHTML = `<p class="gx-error">The press jammed — couldn't load genres.json (${esc(err.message)}).</p>`;
         return;
       }
 
@@ -81,7 +91,7 @@
       // { genre, games: [], failed: true } so one bad genre doesn't break the page.
       const results = await Promise.all(genres.map(async (genre) => {
         const base = new URL(genre.base, document.baseURI);
-        const label = genre.slug === 'others-games' ? 'CLASSICS' : (genre.title || genre.slug).toUpperCase();
+        const label = genre.slug === 'others-games' ? 'Borrowed' : (genre.title || genre.slug);
         try {
           const manifest = await fetchJSON(new URL('games.json', base));
           const games = (manifest.games || []).map((g) => decorate(g, genre, base, label));
@@ -96,16 +106,12 @@
       loadActivity(results).catch(() => {});
     }
 
-    // Decorate a raw game with derived cabinet fields — EXACTLY like app.js.
+    // Decorate a raw game with catalogue fields — same shape as app.js, REAL data only.
     function decorate(game, genre, base, label) {
-      const h = hashStr((game.slug || game.title) + genre.slug);
-      const rating = game.rating != null ? game.rating : 3 + (h % 3);
-      const score = game.score != null ? game.score : 5000 + (h % 1495000);
-      const hot = game.hot != null ? game.hot : ((game.tags || []).some((t) => /classic|retro|arcade/i.test(t)) || h % 5 === 0);
       return {
         slug: game.slug, title: game.title, genre: genre.slug, genreLabel: label,
-        icon: ICON[genre.slug] || 'i-arcade', dims: game.dims || '2D',
-        tags: game.tags || [], rating, score, hot,
+        icon: ICON[genre.slug] || 'i-coin', dims: game.dims || '2D',
+        tags: game.tags || [], best: bestOf(genre.slug, game.slug),
         url: game.path ? new URL(game.path, base).href : null, fkey: fKey(genre.slug),
       };
     }
@@ -116,13 +122,12 @@
       const failed = results.filter((r) => r.failed);
       const allGames = ok.flatMap((r) => r.games);
 
-      // (A) Catalog headline numbers.
+      // (A) Catalogue headline numbers — all counted, none invented.
       const totalGenres = results.length;
       const totalGames = allGames.length;
       const count2D = allGames.filter((g) => String(g.dims).toUpperCase() === '2D').length;
       const count3D = allGames.filter((g) => String(g.dims).toUpperCase() === '3D').length;
 
-      // Tag histogram (tag -> count), sorted by count desc then name.
       const tagCounts = new Map();
       for (const g of allGames) {
         for (const tag of (g.tags || [])) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
@@ -130,79 +135,79 @@
       const distinctTags = tagCounts.size;
       const sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
+      countEl.textContent = `${totalGames} ${totalGames === 1 ? 'entry' : 'entries'} in ${totalGenres} ${totalGenres === 1 ? 'genre' : 'genres'}`;
+
       const parts = [];
 
-      // --- (A) Catalog overview ---
-      parts.push(sectionTitle('Catalog'));
+      // --- (A) The catalogue, in numbers ---
+      parts.push(sectionTitle('The catalogue, counted'));
       parts.push(`
         <div class="gx-stats-grid">
-          ${statCard(totalGenres, totalGenres === 1 ? 'Genre' : 'Genres')}
-          ${statCard(totalGames, totalGames === 1 ? 'Game' : 'Games')}
-          ${statCard(count2D, '2D Games')}
-          ${statCard(count3D, '3D Games')}
-          ${statCard(distinctTags, distinctTags === 1 ? 'Distinct Tag' : 'Distinct Tags')}
+          ${statCard(fmtNum(totalGenres), totalGenres === 1 ? 'genre' : 'genres')}
+          ${statCard(fmtNum(totalGames), totalGames === 1 ? 'game in the rack' : 'games in the rack')}
+          ${statCard(fmtNum(count2D), '2D')}
+          ${statCard(fmtNum(count3D), '3D')}
+          ${statCard(fmtNum(distinctTags), distinctTags === 1 ? 'distinct tag' : 'distinct tags')}
         </div>`);
 
       if (failed.length) {
         const names = failed.map((r) => esc(r.genre.title || r.genre.slug)).join(', ');
-        parts.push(`<p class="gx-error" style="padding-top:var(--sp-3)">Skipped ${failed.length} genre${failed.length === 1 ? '' : 's'} whose games.json failed to load: ${names}.</p>`);
+        parts.push(`<p class="gx-error">Skipped ${failed.length} genre${failed.length === 1 ? '' : 's'} whose games.json wouldn't load: ${names}.</p>`);
       }
 
       // --- (B) Global activity (filled in async) ---
-      parts.push(sectionTitle('Global activity'));
+      parts.push(sectionTitle('What everyone has done'));
       parts.push(`
-        <div class="gx-stats-grid" id="global-grid">
-          ${statCard('…', 'Site Visits', 'g-visits')}
-          ${statCard('…', 'Game Plays', 'g-plays')}
+        <div class="gx-stats-grid">
+          ${statCard('…', 'visits, all readers', 'g-visits')}
+          ${statCard('…', 'games launched', 'g-plays')}
         </div>
-        <h3 class="gx-cab__title" style="margin:var(--sp-5) 0 var(--sp-3)">Top Played Games</h3>
-        <div class="gx-bar" id="top-bars"><p class="gx-empty"><h3>LOADING</h3><p>Live counts incoming</p></p></div>`);
+        <div class="gx-cabhead"><h2>Most played</h2><span class="gx-cabhead__count">live counts</span></div>
+        <div class="gx-bar" id="top-bars"><p class="gx-board__foot">Tallying the live counts…</p></div>`);
 
       // --- (C) Your device (local) ---
       const localVisits = safeLocal('visits');
       const localPlays = safeLocal('plays');
-      parts.push(sectionTitle('Your device'));
+      parts.push(sectionTitle('On this device'));
       parts.push(`
         <div class="gx-stats-grid">
-          ${statCard(localVisits, 'Your Visits')}
-          ${statCard(localPlays, 'Your Plays')}
+          ${statCard(localVisits, 'your visits')}
+          ${statCard(localPlays, 'your plays')}
         </div>
-        <h3 class="gx-cab__title" style="margin:var(--sp-5) 0 var(--sp-3)">What You've Played</h3>
-        <div class="gx-bar" id="local-bars"><p class="gx-empty"><h3>NO PLAYS YET</h3><p>Nothing played on this device</p></p></div>`);
+        <div class="gx-cabhead"><h2>What you've played here</h2><span class="gx-cabhead__count">this browser only</span></div>
+        <div class="gx-bar" id="local-bars"><p class="gx-board__foot">Nothing played on this device yet.</p></div>`);
 
-      // --- Per-genre breakdown (cabinet cards, matches the hub) ---
-      parts.push(sectionTitle('By genre'));
+      // --- The rack, by genre (real catalogue entries) ---
+      parts.push(sectionTitle('The rack, by genre'));
       for (const r of results) {
         const g = r.genre;
         const n = r.games.length;
-        const label = g.slug === 'others-games' ? 'CLASSICS' : (g.title || g.slug || 'GENRE').toUpperCase();
-        const countText = r.failed ? 'GAMES.JSON UNAVAILABLE' : `${n} ${n === 1 ? 'CABINET' : 'CABINETS'}`;
+        const label = g.slug === 'others-games' ? 'Borrowed' : (g.title || g.slug || 'genre');
+        const countText = r.failed ? "manifest wouldn't load" : `${n} ${n === 1 ? 'entry' : 'entries'}`;
         const grid = r.failed || !n
-          ? `<div class="gx-empty"><h3>${r.failed ? 'MANIFEST UNAVAILABLE' : 'NO CABINETS YET'}</h3><p>${r.failed ? 'Insert a different coin' : 'Check back soon'}</p></div>`
-          : `<div class="gx-grid">${r.games.map(cabinet).join('')}</div>`;
+          ? `<div class="gx-empty"><h3>${r.failed ? 'Nothing to set.' : 'Nothing here yet.'}</h3><p>${r.failed ? 'This genre’s manifest is missing.' : 'Check back next issue.'}</p></div>`
+          : `<div class="gx-grid">${r.games.map(entry).join('')}</div>`;
         parts.push(`
-          <section style="margin:var(--sp-5) 0">
-            <div class="gx-cabhead">
-              <h2>${ico(ICON[g.slug] || 'i-arcade')} ${esc(label)}</h2>
-              <span class="gx-cabhead__count">${esc(countText)}</span>
-            </div>
-            ${grid}
-          </section>`);
+          <div class="gx-cabhead">
+            <h2>${ico(ICON[g.slug] || 'i-coin')} ${esc(label)}</h2>
+            <span class="gx-cabhead__count">${esc(countText)}</span>
+          </div>
+          ${grid}`);
       }
 
-      // --- Tag histogram (styled with gx-bar) ---
-      parts.push(sectionTitle('Tags'));
+      // --- Tags, in order of frequency ---
+      parts.push(sectionTitle('Tags, by frequency'));
       if (!sortedTags.length) {
-        parts.push(`<div class="gx-empty"><h3>NO TAGS FOUND</h3><p>Insert a different coin</p></div>`);
+        parts.push(`<div class="gx-empty"><h3>No tags set.</h3><p>The manifests carry no tags yet.</p></div>`);
       } else {
         const max = sortedTags[0][1];
-        const rows = sortedTags.map(([tag, count]) => barRow(tag, count, Math.round((count / max) * 100))).join('');
+        const rows = sortedTags.map(([tag, count]) => barRow(tag, fmtNum(count), Math.max(4, Math.round((count / max) * 100)))).join('');
         parts.push(`<div class="gx-bar">${rows}</div>`);
       }
 
       statsEl.innerHTML = parts.join('');
 
-      // Record a play before a cabinet navigates to its game (matches the hub).
+      // Record a play before a catalogue entry navigates to its game (matches app.js).
       statsEl.addEventListener('click', (e) => {
         const cab = e.target.closest('.gx-cabinet[data-slug]');
         if (!cab) return;
@@ -222,32 +227,30 @@
       renderLocalPlays(titleBySlug);
 
       // --- (B) global activity (best-effort) ---
+      const tb = document.getElementById('top-bars');
       if (!window.gamfStats) {
         setGlobalCard('g-visits', '—');
         setGlobalCard('g-plays', '—');
-        const tb = document.getElementById('top-bars');
-        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>OFFLINE</h3><p>Live counts unavailable</p></div>`;
+        if (tb) tb.innerHTML = `<p class="gx-board__foot">Live counts are unavailable right now.</p>`;
         return;
       }
 
       const { getGlobal, getGlobalMany } = window.gamfStats;
 
-      // Totals.
       Promise.resolve(getGlobal('visits')).then((v) => setGlobalCard('g-visits', fmtNum(v))).catch(() => setGlobalCard('g-visits', '—'));
       Promise.resolve(getGlobal('plays')).then((v) => setGlobalCard('g-plays', fmtNum(v))).catch(() => setGlobalCard('g-plays', '—'));
 
-      // Top played: query play-<slug> for every game, sort desc, show top ~10.
+      // Most played: query play-<slug> for every game, sort desc, show top ~10.
       const slugs = allGames.map((g) => g.slug).filter(Boolean);
-      const tb = document.getElementById('top-bars');
       if (!slugs.length) {
-        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>NO GAMES</h3><p>Nothing to rank</p></div>`;
+        if (tb) tb.innerHTML = `<p class="gx-board__foot">Nothing in the rack to rank.</p>`;
         return;
       }
       let counts;
       try {
         counts = await getGlobalMany(slugs.map((s) => 'play-' + s));
       } catch {
-        if (tb) tb.innerHTML = `<div class="gx-empty"><h3>OFFLINE</h3><p>Live counts unavailable</p></div>`;
+        if (tb) tb.innerHTML = `<p class="gx-board__foot">Live counts are unavailable right now.</p>`;
         return;
       }
       const ranked = slugs
@@ -258,7 +261,7 @@
 
       if (!tb) return;
       if (!ranked.length) {
-        tb.innerHTML = `<div class="gx-empty"><h3>NO PLAYS YET</h3><p>Be the first to play</p></div>`;
+        tb.innerHTML = `<p class="gx-board__foot">No plays counted yet — be the first.</p>`;
         return;
       }
       const max = ranked[0].n;
@@ -276,32 +279,30 @@
         .filter((x) => x.n > 0)
         .sort((a, b) => b.n - a.n);
       if (!entries.length) {
-        lb.innerHTML = `<div class="gx-empty"><h3>NO PLAYS YET</h3><p>Nothing played on this device</p></div>`;
+        lb.innerHTML = `<p class="gx-board__foot">Nothing played on this device yet.</p>`;
         return;
       }
       const max = entries[0].n;
       lb.innerHTML = entries.map((x) =>
-        barRow(x.title, x.n, Math.max(4, Math.round((x.n / max) * 100)))
+        barRow(x.title, fmtNum(x.n), Math.max(4, Math.round((x.n / max) * 100)))
       ).join('');
     }
 
     /* ----------------------------------------------------------- templates */
-    // Cabinet card — markup copied from app.js cabinet(), so a tap records a
-    // play (window.gamfPlay) before navigating to the game.
-    function ratingTicks(r) { let s = ''; for (let i = 0; i < 5; i++) s += `<span class="${i < r ? 'on' : ''}"></span>`; return `<div class="gx-rate">${s}</div>`; }
-    function cabinet(g) {
+    // Catalogue entry — markup copied from app.js entry(): a plate (icon + genre
+    // + dims), a title, and a control row showing the reader's REAL local best,
+    // or a couple of tags / the dims when there is none. A tap records a play
+    // (window.gamfPlay) before navigating to the game.
+    function entry(g) {
+      const meta = g.best > 0 ? `Best ${fmtNum(g.best)}` : (g.tags.slice(0, 2).join(', ') || g.dims);
       const data = `data-slug="${esc(g.slug || '')}"${g.url ? ` data-url="${esc(g.url)}"` : ''}`;
-      return `<button class="gx-cabinet" ${data} aria-label="Play ${esc(g.title)}, ${esc(g.genreLabel)}">
+      const tag = g.url ? 'a' : 'button';
+      const href = g.url ? ` href="${esc(g.url)}"` : '';
+      return `<${tag} class="gx-cabinet" ${data}${href}>
         <div class="gx-cab__plate">${ico(g.icon)}<span class="gx-cab__genre">${esc(g.genreLabel)}</span><span class="gx-cab__dims">${esc(g.dims)}</span></div>
-        <div class="gx-cab__cover${g.hot ? ' is-hot' : ''}">
-          <span class="gx-cab__big">${ico(g.icon)}</span>
-          ${g.hot ? `<span class="gx-cab__hot">${ico('i-bolt')} Hot</span>` : ''}
-          <h3 class="gx-cab__title">${esc(String(g.title).toUpperCase())}</h3>
-        </div>
-        <div class="gx-cab__ctrl">
-          <div style="min-width:0">${ratingTicks(g.rating)}<span class="gx-cab__hi">HI ${fmtNum(g.score)}</span></div>
-          <span class="gx-cab__play">${ico('i-play')} Play</span>
-        </div></button>`;
+        <h3 class="gx-cab__title">${esc(g.title)}</h3>
+        <div class="gx-cab__ctrl"><span class="gx-cab__hi">${esc(meta)}</span><span class="gx-cab__play">Play</span></div>
+      </${tag}>`;
     }
 
     function sectionTitle(t) { return `<h2 class="gx-section-title">${esc(t)}</h2>`; }
@@ -357,7 +358,6 @@
       ));
     }
 
-    // Register the service worker for offline/installable behaviour.
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
     }
